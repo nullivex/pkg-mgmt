@@ -1,10 +1,16 @@
 #!/bin/bash
 
-push() {
+edit() {
 	for line in $1; do
-		echo "Pushing $line"
+		echo "Editing $line"
 		cd $line;
-		git push && git push --tags
+		git checkout master
+		sed -i "s/~0.0.1/dev-master/g" composer.json
+		git commit -a -m "fixed versioning for dev"
+		git checkout 0.0.x-dev
+		git merge master
+		sed -i "s/dev-master/~0.0.1/g" composer.json
+		git commit -a -m "changed version world for branch"
 		cd ..
 	done
 }
@@ -19,18 +25,18 @@ if [ $(cat to_release | wc -l) -eq 0 ]; then
 	exit
 fi
 
-echo "Packages to be pushed:"
+echo "Packages to be edited:"
 to_release=$(cat to_release | grep -oP "[0-9a-z\-]+$")
 echo -e "$to_release"
 
 read -r -p "Are you sure? [Y/n] " response
 case $response in
 	[yY][eE][sS]|[yY])
-		push "$to_release"
+		edit "$to_release"
 		exit
 		;;
 	*)
-		echo "Will not release"
+		echo "Will not edit"
 		exit
 		;;
 esac
