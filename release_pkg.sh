@@ -47,7 +47,7 @@ fi
 
 # check for changes in master and push if we have them
 changes=$(git rev-list --left-right origin/master...HEAD --count | awk '{print $2}')
-if [ $changes -gt 1 ];
+if [ $changes -gt 1 ]; then
 	git push
 fi
 
